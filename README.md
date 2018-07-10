@@ -6,15 +6,6 @@ Using libraries:
  - [gobot.io](https://gobot.io/)
  - [periph.io](https://periph.io/)
 
-To use gobot with the current release of periph I've modify the file
-`gobot.io/x/gobot/drivers/spi/spi.go` line 83 from:
-```
-c, err := p.Connect(maxSpeed, xspi.Mode(mode), bits)
-```
-to:
-```
-c, err := p.Connect(physic.Frequency(maxSpeed), xspi.Mode(mode), bits)
-```
 
 ## Full project
 
