@@ -90,7 +90,7 @@ func workMCP(robotName string, mcp *spi.MCP3008Driver, eventer gobot.Eventer, wa
 				stopReadAnalogData = nil
 			}
 
-			log.Printf("robot '%s' will be '%s'\n'", robotName, stopWorkers)
+			log.Printf("robot '%s' will be '%s'\n", robotName, stopWorkers)
 			if exitNow, ok := e.Data.(bool); !ok || exitNow {
 				eventer.Unsubscribe(commands)
 				return
