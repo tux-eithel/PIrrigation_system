@@ -150,8 +150,8 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 	commands := eventer.Subscribe()
 	quit := make(chan bool)
 
-	// This routine will wait events
-	// from commands channel and in case a stopWorkers with "true" value
+	// This routine will wait events from commands channel
+	// and in case a stopWorkers with "true" value
 	// will be received, we close the scheduler
 	go func() {
 		for e := range commands {
