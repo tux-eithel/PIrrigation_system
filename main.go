@@ -57,7 +57,7 @@ func main() {
 
 	// Create the MCP driver.
 	// This driver is useful to read some analogic.
-	mcp := spi.NewMCP3008Driver(r, spi.WithSpeed(1350))
+	mcp := spi.NewMCP3008Driver(r, spi.WithSpeed(1350000))
 	robotAcqua := gobot.NewRobot("Sensore Acqua",
 		[]gobot.Connection{r},
 		[]gobot.Device{mcp},
