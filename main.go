@@ -79,8 +79,32 @@ func main() {
 	go func() {
 		buff := bufio.NewReader(os.Stdin)
 		for {
-			fmt.Printf("Inserisci data inizio e fine separate da ' - ': ")
+			fmt.Printf("Inserisci data inizio e fine separate da ' - ' (p per la schedulazione corrente): ")
 			text, _ := buff.ReadString('\n')
+
+			if text == "\n" {
+				continue
+			}
+
+			// Command wich prints the current schedule status
+			if text[:len(text)-1] == "p" {
+				fmt.Println("Stato schedulazione:")
+
+				for _, s := range scheduler.PrintStatus() {
+					var stato string
+					if s.started {
+						stato = "in corso"
+					} else {
+						stato = fmt.Sprintf("inizierà tra %v", s.willStart)
+					}
+					fmt.Printf("Inizio %s, Fine %s: %s\n",
+						s.start.Format("02/01/2006 15:04"),
+						s.end.Format("02/01/2006 15:04"),
+						stato)
+				}
+				continue
+			}
+
 			t, err := newWaterTime(text[:len(text)-1])
 			if err != nil {
 				fmt.Printf("unable to parse time: %v, skip...\n", err)
