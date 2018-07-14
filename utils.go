@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"gobot.io/x/gobot"
@@ -23,7 +22,6 @@ func readsFromMCP(mcp *spi.MCP3008Driver, interval time.Duration, threshold int)
 	go func() {
 		for {
 			newValue, err := mcp.Read(2)
-			fmt.Println("letto ", newValue)
 			if err != nil {
 				streamValues.Publish(gpio.Error, err)
 			} else if !(oldValue-threshold <= newValue && newValue <= oldValue+threshold) { // Send the value only if it differs for the previous one by the threshold
