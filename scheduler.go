@@ -221,3 +221,26 @@ WAIT_FIRST_SLOT:
 	}
 
 }
+
+type sumWaterTime struct {
+	start     time.Time
+	end       time.Time
+	started   bool
+	willStart time.Duration
+}
+
+func (wtm *waterTimeManager) PrintStatus() []*sumWaterTime {
+	wtm.RLock()
+	defer wtm.RUnlock()
+
+	times := make([]*sumWaterTime, len(wtm.times))
+	for i, t := range wtm.times {
+		times[i] = &sumWaterTime{
+			start:     t.start,
+			end:       t.end,
+			started:   !t.start.After(time.Now()),
+			willStart: time.Until(t.start),
+		}
+	}
+	return times
+}
