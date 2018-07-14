@@ -166,6 +166,8 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 
 	}()
 
+	var timer *time.Timer
+
 WAIT_FIRST_SLOT:
 	for {
 		select {
@@ -180,25 +182,30 @@ WAIT_FIRST_SLOT:
 					continue WAIT_FIRST_SLOT
 				}
 				d := time.Until(nextSlot.start)
+				// If a duration is negative, means that the slot received is currently active.
+				// This happens when the scheduler has been reseted during an active task.
+
 				if d > 0 {
 					log.Printf("Next timer will start at: %v", d)
-				}
-				timer := time.AfterFunc(d, func() {
-					if d > 0 {
+					timer = time.AfterFunc(d, func() {
 						eventer.Publish(startRelay, struct{}{})
-					}
-				})
+					})
+				}
 
 				select {
 				case <-time.After(time.Until(nextSlot.end)): // Wait the end of the process.
 					eventer.Publish(stopWorkers, false)
 					continue WAIT_SLOTS
 				case <-wtm.resetTimer: // Wait if the meanwhile the manager has been reset.
-					timer.Stop()
+					if timer != nil {
+						timer.Stop()
+					}
 					log.Println("reset timer!")
 					continue WAIT_SLOTS
 				case <-quit: // Quit signal. Exits
-					timer.Stop()
+					if timer != nil {
+						timer.Stop()
+					}
 					eventer.Unsubscribe(commands)
 					log.Printf("close the schedule")
 					return
