@@ -1,4 +1,4 @@
-.PONY: help rsync build-amd build-arm
+.PONY: help rsync build deploy
 
 .DEFAULT_GOAL := help
 
@@ -11,6 +11,7 @@ build: ## Build the hello app for ARM
 
 rsync: ## Rsync hello exec to remote server
 	@printf "Rsync file to remote server\n"
-	@rsync -hv --progress robot local_pi:~
+	@rsync -hv --progress robot raspy3b:~
 
+deploy: build rsync
 
