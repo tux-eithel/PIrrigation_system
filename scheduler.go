@@ -145,9 +145,27 @@ func (wtm *waterTimeManager) GetNextSlot() *waterTime {
 // consumerSchedule manages the ticker for the system
 func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.WaitGroup) {
 
-	commands := eventer.Subscribe()
-
 	defer wg.Done()
+
+	commands := eventer.Subscribe()
+	quit := make(chan bool)
+
+	// This routine will wait events
+	// from commands channel and in case a stopWorkers with "true" value
+	// will be received, we close the scheduler
+	go func() {
+		for e := range commands {
+			if e.Name != stopWorkers {
+				continue
+			}
+			if exitNow, ok := e.Data.(bool); !ok || exitNow {
+				quit <- true
+				return
+			}
+		}
+
+	}()
+
 WAIT_FIRST_SLOT:
 	for {
 		select {
@@ -162,9 +180,13 @@ WAIT_FIRST_SLOT:
 					continue WAIT_FIRST_SLOT
 				}
 				d := time.Until(nextSlot.start)
-				log.Printf("Next timer will start at: %v", d)
+				if d > 0 {
+					log.Printf("Next timer will start at: %v", d)
+				}
 				timer := time.AfterFunc(d, func() {
-					eventer.Publish(startRelay, struct{}{})
+					if d > 0 {
+						eventer.Publish(startRelay, struct{}{})
+					}
 				})
 
 				select {
@@ -175,20 +197,18 @@ WAIT_FIRST_SLOT:
 					timer.Stop()
 					log.Println("reset timer!")
 					continue WAIT_SLOTS
-				case e := <-commands: // Quit signal. Exits
+				case <-quit: // Quit signal. Exits
 					timer.Stop()
-					if exitNow, ok := e.Data.(bool); !ok || exitNow {
-						eventer.Unsubscribe(commands)
-						return
-					}
+					eventer.Unsubscribe(commands)
+					log.Printf("close the schedule")
+					return
 				}
 			}
 
-		case e := <-commands: // Quit signal. Exits
-			if exitNow, ok := e.Data.(bool); !ok || exitNow {
-				eventer.Unsubscribe(commands)
-				return
-			}
+		case <-quit: // Quit signal. Exits
+			eventer.Unsubscribe(commands)
+			log.Printf("close the schedule")
+			return
 
 		}
 	}
