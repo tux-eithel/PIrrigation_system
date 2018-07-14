@@ -12,7 +12,6 @@ import (
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/spi"
 	"gobot.io/x/gobot/platforms/raspi"
-	"periph.io/x/periph/conn/physic"
 )
 
 const (
@@ -39,6 +38,7 @@ func main() {
 	// The quit channel closes all the workers.
 	waitRobots := &sync.WaitGroup{}
 
+	waitRobots.Add(1)
 	go consumerSchedule(scheduler, genericEventer, waitRobots)
 
 	// Create the reaspberry.
@@ -57,7 +57,7 @@ func main() {
 
 	// Create the MCP driver.
 	// This driver is useful to read some analogic.
-	mcp := spi.NewMCP3008Driver(r, spi.WithSpeed(int64(10*physic.KiloHertz)))
+	mcp := spi.NewMCP3008Driver(r, spi.WithSpeed(1350))
 	robotAcqua := gobot.NewRobot("Sensore Acqua",
 		[]gobot.Connection{r},
 		[]gobot.Device{mcp},
