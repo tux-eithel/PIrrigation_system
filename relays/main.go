@@ -1,3 +1,6 @@
+// Package main for relays manages the relays which controls the valves.
+// It's separate from the the "pomp" main which instead controls also the schedulation.
+// Basically this program accepts remote call (gRPC) and open/close valves.
 package main
 
 import (
@@ -90,3 +93,7 @@ func main() {
 		log.Fatalln("Unable to stop robots:", err)
 	}
 }
+
+// TODO: function to open all the valve (used at the start and at the end)
+
+// TODO: define protobuf schema for comunication with the main raspberry
