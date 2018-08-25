@@ -191,7 +191,7 @@ WAIT_FIRST_SLOT:
 				if d > 0 {
 					log.Printf("Next timer will start at: %v", d)
 					timer = time.AfterFunc(d, func() {
-						eventer.Publish(startRelay, struct{}{})
+						eventer.Publish(startRemoteRobots, struct{}{})
 					})
 				}
 
