@@ -19,7 +19,7 @@ func workRelay(robotName string, relay *gpio.RelayDriver, eventer gobot.Eventer,
 	for e := range commands {
 		switch e.Name {
 
-		// Here we start the raley.
+		// Here we start the relay.
 		// If all goes well we are going to start the MCP
 		case startRelay:
 			err = relay.Off()
