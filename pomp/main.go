@@ -14,6 +14,10 @@ import (
 	"gobot.io/x/gobot/platforms/raspi"
 )
 
+type (
+	StopSignal string
+)
+
 const (
 	startRelay        = "START_RELAY"
 	startMCP          = "START_MCP"
@@ -22,6 +26,10 @@ const (
 	// stopWorkers events accept booleans.
 	// If is true, then it will stop and exit the worker
 	stopWorkers = "STOP_WORKERS"
+
+	stopRemote StopSignal = "STOP_REMOTE"
+	stopLocal  StopSignal = "STOP_LOCAL"
+	stopQuit   StopSignal = "STOP_QUIT"
 )
 
 func main() {
@@ -134,7 +142,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
-	genericEventer.Publish(stopWorkers, true)
+	genericEventer.Publish(stopWorkers, stopQuit)
 
 	// Stop all the robots
 	log.Println("wait all robots closes...")
