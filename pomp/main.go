@@ -44,6 +44,9 @@ func main() {
 	waitRobots := &sync.WaitGroup{}
 
 	waitRobots.Add(1)
+	go workRemoteRobots("remote relays", genericEventer, waitRobots)
+
+	waitRobots.Add(1)
 	go consumerSchedule(scheduler, genericEventer, waitRobots)
 
 	// Create the reaspberry.
