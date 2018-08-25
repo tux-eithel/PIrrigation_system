@@ -161,7 +161,7 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 			if e.Name != stopWorkers {
 				continue
 			}
-			if exitNow, ok := e.Data.(bool); !ok || exitNow {
+			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
 				quit <- true
 				return
 			}
@@ -197,7 +197,7 @@ WAIT_FIRST_SLOT:
 
 				select {
 				case <-time.After(time.Until(nextSlot.end)): // Wait the end of the process.
-					eventer.Publish(stopWorkers, false)
+					eventer.Publish(stopWorkers, stopRemote)
 					continue WAIT_SLOTS
 				case <-wtm.resetTimer: // Wait if the meanwhile the manager has been reset.
 					if timer != nil {
