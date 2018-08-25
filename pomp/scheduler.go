@@ -97,6 +97,9 @@ func (wtm *waterTimeManager) Append(wt *waterTime) (bool, error) {
 			if t.end.After(oldTime.start) && t.end.Before(oldTime.end) {
 				return fmt.Errorf("time end '%v' is inside %v-%v range", t.end, oldTime.start, oldTime.end)
 			}
+			if t.start.Before(oldTime.start) && t.end.After(oldTime.end) {
+				return fmt.Errorf("time range %v-%v, include the rage %v-%v", t.start, t.end, oldTime.start, oldTime.end)
+			}
 		}
 		return nil
 	}
