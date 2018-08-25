@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	startRelay = "START_RELAY"
-	startMCP   = "START_MCP"
+	startRelay        = "START_RELAY"
+	startMCP          = "START_MCP"
+	startRemoteRobots = "START_REMOTE_ROBOTS"
 
 	// stopWorkers events accept booleans.
 	// If is true, then it will stop and exit the worker
@@ -34,6 +35,10 @@ func main() {
 
 	// Instance the time scheduler
 	scheduler := newWaterTimeManager()
+
+	if ok := initRemoteRobots(); !ok {
+		log.Fatalln("unable to start remote Robots")
+	}
 
 	// The quit channel closes all the workers.
 	waitRobots := &sync.WaitGroup{}
