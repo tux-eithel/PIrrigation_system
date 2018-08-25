@@ -46,12 +46,16 @@ func main() {
 
 	// Create the relay/led.
 	// It's functions are On/Off/Toggle
-	//relay := gpio.NewRelayDriver(r, "7")
-	relay := gpio.NewLedDriver(r, "35")
+	relay := gpio.NewRelayDriver(r, "7")
+	//relay := gpio.NewLedDriver(r, "35")
 	robotRelay := gobot.NewRobot("Relay Pompa",
 		[]gobot.Connection{r},
 		[]gobot.Device{relay},
 	)
+	err := relay.On()
+	if err != nil {
+		log.Fatalln("unable to set HIGH the Realy Pompa:", err)
+	}
 	waitRobots.Add(1)
 	go workRelay(robotRelay.Name, relay, genericEventer, waitRobots)
 

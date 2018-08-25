@@ -11,7 +11,7 @@ import (
 )
 
 // workRelay does the raley work.
-func workRelay(robotName string, relay *gpio.LedDriver, eventer gobot.Eventer, waitRobots *sync.WaitGroup) {
+func workRelay(robotName string, relay *gpio.RelayDriver, eventer gobot.Eventer, waitRobots *sync.WaitGroup) {
 	commands := eventer.Subscribe()
 	var err error
 	defer waitRobots.Done()
@@ -22,7 +22,7 @@ func workRelay(robotName string, relay *gpio.LedDriver, eventer gobot.Eventer, w
 		// Here we start the raley.
 		// If all goes well we are going to start the MCP
 		case startRelay:
-			err = relay.On()
+			err = relay.Off()
 			if err != nil {
 				log.Printf("unable to '%s' on robots '%s': %v\n", e.Name, robotName, err)
 			} else {
@@ -32,7 +32,7 @@ func workRelay(robotName string, relay *gpio.LedDriver, eventer gobot.Eventer, w
 
 		// Here we stop the relay.
 		case stopWorkers:
-			err = relay.Off()
+			err = relay.On()
 			if err != nil {
 				log.Printf("unable to '%s' on robots '%s': %v\n", e.Name, robotName, err)
 			} else {
