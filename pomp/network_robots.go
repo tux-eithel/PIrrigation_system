@@ -33,8 +33,9 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 		// Here we stop remote robots.
 		case stopWorkers:
 			// TODO: try to shutdown remote robots
+			err = stopRemoteWork()
 
-			if exitNow, ok := e.Data.(bool); !ok || exitNow {
+			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
 				eventer.Unsubscribe(commands)
 				return
 			}
@@ -46,5 +47,10 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 
 func doRemoteWork() error {
 	// TODO: call using gRPC, the remote robots and wait the response
+	return nil
+}
+
+func stopRemoteWork() error {
+	// TODO: call using gRPC, the remote robots, and wait the response
 	return nil
 }
