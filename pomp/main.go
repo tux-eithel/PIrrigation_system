@@ -73,7 +73,7 @@ func main() {
 	// Starts all the robots!
 	// We pass "false" as parameter so we can manually stop the robots.
 	robots := gobot.Robots{robotAcqua, robotRelay}
-	err := robots.Start(false)
+	err = robots.Start(false)
 	if err != nil {
 		log.Fatalln("Unable to start robots:", err)
 	}
