@@ -161,10 +161,13 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 			if e.Name != stopWorkers {
 				continue
 			}
-			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
+
+			statusExit, ok := e.Data.(StopSignal)
+			if !ok || statusExit == stopQuit {
 				quit <- true
 				return
 			}
+
 		}
 
 	}()

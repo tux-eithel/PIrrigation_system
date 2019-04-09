@@ -32,12 +32,22 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 
 		// Here we stop remote robots.
 		case stopWorkers:
-			// TODO: try to shutdown remote robots
-			err = stopRemoteWork()
 
-			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
+			statusExit, ok := e.Data.(StopSignal)
+			if !ok || statusExit == stopQuit {
 				eventer.Unsubscribe(commands)
 				return
+			}
+
+			if statusExit == stopRemote {
+				// TODO: try to shutdown remote robots
+				err = stopRemoteWork()
+				if err != nil {
+					eventer.Publish(stopWorkers, stopLocal)
+				} else {
+					eventer.Publish(stopWorkers, stopQuit)
+				}
+
 			}
 
 		}

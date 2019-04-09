@@ -32,14 +32,24 @@ func workRelay(robotName string, relay *gpio.RelayDriver, eventer gobot.Eventer,
 
 		// Here we stop the relay.
 		case stopWorkers:
-			err = relay.On()
-			if err != nil {
-				log.Printf("unable to '%s' on robots '%s': %v\n", e.Name, robotName, err)
-			} else {
-				log.Printf("robot '%s' will be '%s'\n", robotName, e.Name)
+
+			statusExit, ok := e.Data.(StopSignal)
+			if !ok {
+				eventer.Unsubscribe(commands)
+				return
 			}
 
-			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
+			if statusExit == stopLocal || statusExit == stopQuit {
+				err = relay.On()
+				if err != nil {
+					log.Printf("unable to '%s' on robots '%s': %v\n", e.Name, robotName, err)
+				} else {
+					log.Printf("robot '%s' will be '%s'\n", robotName, e.Name)
+				}
+
+			}
+
+			if statusExit == stopQuit {
 				eventer.Unsubscribe(commands)
 				return
 			}
@@ -85,16 +95,22 @@ func workMCP(robotName string, mcp *spi.MCP3008Driver, eventer gobot.Eventer, wa
 
 		// Here we are going to close the MCP
 		case stopWorkers:
-			if stopReadAnalogData != nil {
-				stopReadAnalogData <- struct{}{}
-				stopReadAnalogData = nil
-			}
 
-			log.Printf("robot '%s' will be '%s'\n", robotName, stopWorkers)
-			if statusExit, ok := e.Data.(StopSignal); !ok || statusExit == stopQuit {
+			statusExit, ok := e.Data.(StopSignal)
+			if !ok || statusExit == stopQuit {
 				eventer.Unsubscribe(commands)
 				return
 			}
+
+			if statusExit == stopLocal {
+				if stopReadAnalogData != nil {
+					stopReadAnalogData <- struct{}{}
+					stopReadAnalogData = nil
+				}
+
+				log.Printf("robot '%s' will be '%s'\n", robotName, stopWorkers)
+			}
+
 		}
 
 	}
