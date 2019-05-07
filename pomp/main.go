@@ -27,9 +27,9 @@ const (
 	// If is true, then it will stop and exit the worker
 	stopWorkers = "STOP_WORKERS"
 
-	stopRemote StopSignal = "STOP_REMOTE"
-	stopLocal  StopSignal = "STOP_LOCAL"
-	stopQuit   StopSignal = "STOP_QUIT"
+	stopRemote  StopSignal = "STOP_REMOTE"
+	stopLocal   StopSignal = "STOP_LOCAL"
+	stopAndQuit StopSignal = "STOP_QUIT"
 )
 
 func main() {
@@ -87,9 +87,8 @@ func main() {
 	go workMCP(robotAcqua.Name, mcp, genericEventer, waitRobots)
 
 	// Starts all the robots!
-	// We pass "false" as parameter so we can manually stop the robots.
 	robots := gobot.Robots{robotAcqua, robotRelay}
-	err = robots.Start(false)
+	err = robots.Start(false) // We pass "false" as parameter so we can manually stop the robots.
 	if err != nil {
 		log.Fatalln("Unable to start robots:", err)
 	}
@@ -142,7 +141,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
-	genericEventer.Publish(stopWorkers, stopQuit)
+	genericEventer.Publish(stopWorkers, stopAndQuit)
 
 	// Stop all the robots
 	log.Println("wait all robots closes...")

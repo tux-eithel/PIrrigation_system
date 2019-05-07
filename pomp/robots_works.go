@@ -39,7 +39,7 @@ func workRelay(robotName string, relay *gpio.RelayDriver, eventer gobot.Eventer,
 				return
 			}
 
-			if statusExit == stopLocal || statusExit == stopQuit {
+			if statusExit == stopLocal || statusExit == stopAndQuit {
 				err = relay.On()
 				if err != nil {
 					log.Printf("unable to '%s' on robots '%s': %v\n", e.Name, robotName, err)
@@ -49,7 +49,7 @@ func workRelay(robotName string, relay *gpio.RelayDriver, eventer gobot.Eventer,
 
 			}
 
-			if statusExit == stopQuit {
+			if statusExit == stopAndQuit {
 				eventer.Unsubscribe(commands)
 				return
 			}
@@ -82,12 +82,12 @@ func workMCP(robotName string, mcp *spi.MCP3008Driver, eventer gobot.Eventer, wa
 					case gpio.Error:
 						err = ae.Data.(error)
 						log.Printf("robot '%s' unable to read value: %v... for security reason we are going to shut down the system!\n\n", robotName, err)
-						eventer.Publish(stopWorkers, stopQuit)
+						eventer.Publish(stopWorkers, stopAndQuit)
 						return
 					case gpio.Data:
 						value := ae.Data.(int)
 						log.Printf("robot '%s' seems like there is no water '%d'... we are going to shut down the system!\n", robotName, value)
-						eventer.Publish(stopWorkers, stopQuit)
+						eventer.Publish(stopWorkers, stopAndQuit)
 						return
 					}
 				}
@@ -97,7 +97,7 @@ func workMCP(robotName string, mcp *spi.MCP3008Driver, eventer gobot.Eventer, wa
 		case stopWorkers:
 
 			statusExit, ok := e.Data.(StopSignal)
-			if !ok || statusExit == stopQuit {
+			if !ok || statusExit == stopAndQuit {
 				eventer.Unsubscribe(commands)
 				return
 			}

@@ -46,11 +46,11 @@ func newWaterTime(row string) (*waterTime, error) {
 
 }
 
-// waterTimeManager is a struct to keep the queue of waterTime.
+// waterTimeManager is a struct to keep the queue of waterTimes.
 // It provides a channel used to notify when a new waterTime has been added.
-// This channel is useful to understand when the manager has changed.
+// This channel is useful to understand when the manager changes.
 // After a change has been notified, user must call GetNextSlot to get the correct waterTime
-// (could return the same waterTime)
+// (could return the same waterTime).
 type waterTimeManager struct {
 	// queue of waterTime
 	times []*waterTime
@@ -154,8 +154,8 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 	quit := make(chan bool)
 
 	// This routine will wait events from commands channel
-	// and in case a stopWorkers with "true" value
-	// will be received, we close the scheduler
+	// and in case a stopAndQuit signal will be received,
+	// we close the scheduler
 	go func() {
 		for e := range commands {
 			if e.Name != stopWorkers {
@@ -163,13 +163,11 @@ func consumerSchedule(wtm *waterTimeManager, eventer gobot.Eventer, wg *sync.Wai
 			}
 
 			statusExit, ok := e.Data.(StopSignal)
-			if !ok || statusExit == stopQuit {
+			if !ok || statusExit == stopAndQuit {
 				quit <- true
 				return
 			}
-
 		}
-
 	}()
 
 	var timer *time.Timer

@@ -7,6 +7,8 @@ import (
 	"gobot.io/x/gobot"
 )
 
+// initRemoteRobots initializes the remote worker.
+// It make ah http call (gRPC in future) and way the respose.
 func initRemoteRobots() bool {
 	return true
 }
@@ -19,8 +21,7 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 	for e := range commands {
 		switch e.Name {
 
-		case startRemoteRobots:
-
+		case startRemoteRobots: // Here we start remote robots.
 			// Try to start the remote robots.
 			err = doRemoteWork()
 			if err != nil {
@@ -30,11 +31,11 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 				eventer.Publish(startRelay, struct{}{})
 			}
 
-		// Here we stop remote robots.
-		case stopWorkers:
 
+		case stopWorkers: // Here we stop remote robots.
 			statusExit, ok := e.Data.(StopSignal)
-			if !ok || statusExit == stopQuit {
+			if !ok || statusExit == stopAndQuit {
+				// TODO: add some remote command to shutdown ?
 				eventer.Unsubscribe(commands)
 				return
 			}
@@ -45,7 +46,7 @@ func workRemoteRobots(robotName string, eventer gobot.Eventer, waitRobots *sync.
 				if err != nil {
 					eventer.Publish(stopWorkers, stopLocal)
 				} else {
-					eventer.Publish(stopWorkers, stopQuit)
+					eventer.Publish(stopWorkers, stopAndQuit)
 				}
 
 			}
